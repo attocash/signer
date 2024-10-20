@@ -17,11 +17,14 @@ springdoc:
   swagger-ui:
     path: /
 
+server:
+  port: ${ATTO_SIGNER_PORT:8080}
+
 management:
   server:
-    port: 8081
+    port: ${ATTO_SIGNER_MANAGEMENT_PORT:8081}
   endpoints:
     web:
-      base-path: /
-      exposure:
-        include: health,metrics,prometheus
+    base-path: /
+    exposure:
+    include: health,metrics,prometheus
