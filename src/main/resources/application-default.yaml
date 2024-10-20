@@ -8,4 +8,3 @@ atto:
 logging:
   level:
     cash.atto: DEBUG
-    cash.atto.gatekeeper.Streamer: INFO

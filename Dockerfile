@@ -1,9 +1,9 @@
 FROM scratch
 
-COPY ./build/native/nativeCompile/gatekeeper /app/gatekeeper
+COPY ./build/native/nativeCompile/signer /app/signer
 
 WORKDIR /app
 
 EXPOSE 8080
 
-ENTRYPOINT ["./gatekeeper"]
+ENTRYPOINT ["./signer"]
