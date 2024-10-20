@@ -1,0 +1,27 @@
+# Managed by management-terraform
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: gradle/actions/wrapper-validation@v4
+
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm'
+          java-version: '21'
+          cache: 'gradle'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew -Pagent test --no-daemon --info --fail-fast
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-image-metadata
+          path: build/native/agent-output/test
