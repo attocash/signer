@@ -47,24 +47,26 @@ class SignatureStepDefinition(
 
     @When("block is signed")
     fun signBlock() {
-        val block = AttoOpenBlock(
-            version = 0U.toAttoVersion(),
-            network = AttoNetwork.LOCAL,
-            algorithm = AttoAlgorithm.V1,
-            publicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
-            balance = AttoAmount.MAX,
-            timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
-            sendHashAlgorithm = AttoAlgorithm.V1,
-            sendHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
-            representativeAlgorithm = AttoAlgorithm.V1,
-            representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
-        )
+        val block =
+            AttoOpenBlock(
+                version = 0U.toAttoVersion(),
+                network = AttoNetwork.LOCAL,
+                algorithm = AttoAlgorithm.V1,
+                publicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
+                balance = AttoAmount.MAX,
+                timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
+                sendHashAlgorithm = AttoAlgorithm.V1,
+                sendHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
+                representativeAlgorithm = AttoAlgorithm.V1,
+                representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
+            )
 
         val request = Json.encodeToString(Request.serializer(AttoBlock.serializer()), Request(block))
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            set("Authorization", properties.token)
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+                set("Authorization", properties.token)
+            }
         val entity = HttpEntity(request, headers)
 
         val response = testRestTemplate.postForObject("/blocks", entity, String::class.java)
@@ -81,20 +83,21 @@ class SignatureStepDefinition(
         }
     }
 
-
     @When("vote is signed")
     fun signVote() {
-        val vote = AttoVote(
-            blockAlgorithm = AttoAlgorithm.V1,
-            blockHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
-            timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
-        )
+        val vote =
+            AttoVote(
+                blockAlgorithm = AttoAlgorithm.V1,
+                blockHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
+                timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
+            )
 
         val request = Json.encodeToString(Request.serializer(AttoVote.serializer()), Request(vote))
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            set("Authorization", properties.token)
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+                set("Authorization", properties.token)
+            }
         val entity = HttpEntity(request, headers)
 
         val response = testRestTemplate.postForObject("/votes", entity, String::class.java)
@@ -107,10 +110,11 @@ class SignatureStepDefinition(
         val challenge = AttoChallenge(ByteArray(64))
 
         val request = Json.encodeToString(Request.serializer(AttoChallenge.serializer()), Request(challenge))
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_JSON
-            set("Authorization", properties.token)
-        }
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+                set("Authorization", properties.token)
+            }
         val entity = HttpEntity(request, headers)
 
         val response = testRestTemplate.postForObject("/challenges", entity, String::class.java)
@@ -126,6 +130,4 @@ class SignatureStepDefinition(
     override fun clear() {
         signature = null
     }
-
-
 }

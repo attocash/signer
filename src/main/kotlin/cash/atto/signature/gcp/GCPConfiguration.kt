@@ -27,14 +27,19 @@ class GCPConfiguration {
     }
 }
 
-
-private class GCPSigner(private val client: KeyManagementServiceClient, val key: String) : AttoSigner, Closeable {
+private class GCPSigner(
+    private val client: KeyManagementServiceClient,
+    val key: String,
+) : AttoSigner,
+    Closeable {
     override val publicKey: AttoPublicKey by lazy {
         val pem = client.getPublicKey(key).pem
 
-        val cleanedPem = pem.replace("-----BEGIN PUBLIC KEY-----", "")
-            .replace("-----END PUBLIC KEY-----", "")
-            .replace("\\s".toRegex(), "")
+        val cleanedPem =
+            pem
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replace("\\s".toRegex(), "")
 
         AttoPublicKey(Base64.getDecoder().decode(cleanedPem).sliceArray(12 until 44))
     }
@@ -42,21 +47,22 @@ private class GCPSigner(private val client: KeyManagementServiceClient, val key:
     val dispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
 
     override suspend fun sign(hash: AttoHash): AttoSignature {
-        val request = AsymmetricSignRequest.newBuilder()
-            .setName(key)
-            .setData(ByteString.copyFrom(hash.value))
-            .build()
+        val request =
+            AsymmetricSignRequest
+                .newBuilder()
+                .setName(key)
+                .setData(ByteString.copyFrom(hash.value))
+                .build()
 
-        val response = withContext(dispatcher) {
-            client.asymmetricSign(request)
-        }
+        val response =
+            withContext(dispatcher) {
+                client.asymmetricSign(request)
+            }
 
         return AttoSignature(response.signature.toByteArray())
-
     }
 
     override fun close() {
         client.close()
     }
-
 }

@@ -9,9 +9,11 @@ import cash.atto.commons.AttoSigner
 import cash.atto.commons.AttoVote
 import org.springframework.stereotype.Service
 
-
 @Service
-class SignatureService(private val signer: AttoSigner, private val properties: ApplicationProperties) {
+class SignatureService(
+    private val signer: AttoSigner,
+    private val properties: ApplicationProperties,
+) {
     suspend fun sign(block: AttoBlock): AttoSignature {
         require(properties.capabilities.contains(Capability.BLOCK)) {
             "Signing a block is not allowed. Capability BLOCK is missing."
@@ -24,7 +26,6 @@ class SignatureService(private val signer: AttoSigner, private val properties: A
             "Signing a vote is not allowed. Capability VOTE is missing."
         }
         return signer.sign(vote)
-
     }
 
     suspend fun sign(challenge: AttoChallenge): AttoSignature {

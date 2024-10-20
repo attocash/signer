@@ -11,5 +11,3 @@ class ApplicationProperties {
     lateinit var backend: BackendType
     lateinit var key: String
 }
-
-
