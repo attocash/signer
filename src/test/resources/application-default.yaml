@@ -1,0 +1,11 @@
+atto:
+  token: mock_token
+  capabilities: challenge, block, vote
+  backend: local
+  key: '0000000000000000000000000000000000000000000000000000000000000000'
+
+
+logging:
+  level:
+    cash.atto: DEBUG
+    cash.atto.gatekeeper.Streamer: INFO

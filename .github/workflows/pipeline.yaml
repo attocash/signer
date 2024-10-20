@@ -1,0 +1,47 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - 'release/[0-9]+.x'
+      - main
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+  build:
+    permissions:
+      contents: read
+      packages: write
+    needs:
+      - test
+    uses: ./.github/workflows/build.yaml
+  release-tag:
+    permissions:
+      contents: write
+    if: "startsWith(github.ref, 'refs/heads/release/') && endsWith(github.ref, '.x')"
+    needs:
+      - build
+    uses: ./.github/workflows/release-tag.yaml
+    with:
+      profile: release
+  build-image:
+    permissions:
+      contents: read
+      packages: write
+    needs:
+      - release-tag
+    uses: ./.github/workflows/build-image.yaml
+    with:
+      image: release
+  release:
+    permissions:
+      contents: read
+      packages: write
+    needs:
+      - release-tag
+      - build-image
+    uses: ./.github/workflows/release.yaml
+    with:
+      image: release
+      next-tag: ${{ needs.release-tag.outputs.next-tag }}

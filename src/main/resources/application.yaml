@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: node
+  main:
+    banner-mode: off
+  threads:
+    virtual:
+      enabled: true
+
+atto:
+  token: ${ATTO_SIGNER_TOKEN}
+  capabilities: ${ATTO_SIGNER_CAPABILITIES}
+  backend: ${ATTO_SIGNER_BACKEND}
+  key: ${ATTO_SIGNER_KEY}
+
+springdoc:
+  swagger-ui:
+    path: /
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health,metrics,prometheus
