@@ -14,6 +14,8 @@ class SignatureService(
     private val signer: AttoSigner,
     private val properties: ApplicationProperties,
 ) {
+    val publicKey by lazy { signer.publicKey }
+
     suspend fun sign(block: AttoBlock): AttoSignature {
         require(properties.capabilities.contains(Capability.BLOCK)) {
             "Signing a block is not allowed. Capability BLOCK is missing."

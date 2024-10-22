@@ -16,7 +16,7 @@ import cash.atto.commons.AttoSigner
 import cash.atto.commons.AttoVote
 import cash.atto.commons.isValid
 import cash.atto.commons.toAttoVersion
-import cash.atto.signature.SignatureController.Request
+import cash.atto.signature.SignatureController.SignatureRequest
 import cash.atto.signature.SignatureController.SignatureResponse
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -61,7 +61,7 @@ class SignatureStepDefinition(
                 representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
             )
 
-        val request = Json.encodeToString(Request.serializer(AttoBlock.serializer()), Request(block))
+        val request = Json.encodeToString(SignatureRequest.serializer(AttoBlock.serializer()), SignatureRequest(block))
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -92,7 +92,7 @@ class SignatureStepDefinition(
                 timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
             )
 
-        val request = Json.encodeToString(Request.serializer(AttoVote.serializer()), Request(vote))
+        val request = Json.encodeToString(SignatureRequest.serializer(AttoVote.serializer()), SignatureRequest(vote))
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -109,7 +109,7 @@ class SignatureStepDefinition(
     fun signChallenge() {
         val challenge = AttoChallenge(ByteArray(64))
 
-        val request = Json.encodeToString(Request.serializer(AttoChallenge.serializer()), Request(challenge))
+        val request = Json.encodeToString(SignatureRequest.serializer(AttoChallenge.serializer()), SignatureRequest(challenge))
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
