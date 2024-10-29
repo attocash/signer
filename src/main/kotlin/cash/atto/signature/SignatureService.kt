@@ -7,6 +7,7 @@ import cash.atto.commons.AttoChallenge
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoSigner
 import cash.atto.commons.AttoVote
+import kotlinx.datetime.Instant
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,10 +31,13 @@ class SignatureService(
         return signer.sign(vote)
     }
 
-    suspend fun sign(challenge: AttoChallenge): AttoSignature {
+    suspend fun sign(
+        challenge: AttoChallenge,
+        timestamp: Instant,
+    ): AttoSignature {
         require(properties.capabilities.contains(Capability.CHALLENGE)) {
             "Signing a challenge is not allowed. Capability CHALLENGE is missing."
         }
-        return signer.sign(challenge)
+        return signer.sign(challenge, timestamp)
     }
 }

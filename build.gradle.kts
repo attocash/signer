@@ -24,12 +24,10 @@ repositories {
     }
 }
 
-extra["springCloudVersion"] = "2023.0.0"
-
 dependencies {
     val cucumberVersion = "7.20.1"
 
-    implementation("cash.atto:commons-core:a52d2a0-SNAPSHOT")
+    implementation("cash.atto:commons-core:c09d830-SNAPSHOT")
     implementation("com.google.cloud:google-cloud-kms:2.56.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 

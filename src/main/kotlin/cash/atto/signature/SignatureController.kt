@@ -6,6 +6,7 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoVote
 import jakarta.servlet.http.HttpServletRequest
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,28 +27,43 @@ class SignatureController(
 
     @PostMapping("/blocks")
     suspend fun signBlock(
-        @RequestBody request: SignatureRequest<AttoBlock>,
+        @RequestBody request: BlockSignatureRequest,
     ): SignatureResponse = service.sign(request.target).toResponse()
 
     @PostMapping("/votes")
     suspend fun signVote(
-        @RequestBody request: SignatureRequest<AttoVote>,
+        @RequestBody request: VoteSignatureRequest,
     ): SignatureResponse = service.sign(request.target).toResponse()
 
     @PostMapping("/challenges")
     suspend fun signChallenge(
-        @RequestBody request: SignatureRequest<AttoChallenge>,
-    ): SignatureResponse = service.sign(request.target).toResponse()
+        @RequestBody request: ChallengeSignatureRequest,
+    ): SignatureResponse = service.sign(request.target, request.timestamp).toResponse()
 
     @Serializable
     data class PublicKeyResponse(
         val publicKey: AttoPublicKey,
     )
 
+    interface SignatureRequest<T> {
+        val target: T
+    }
+
     @Serializable
-    data class SignatureRequest<T>(
-        val target: T,
-    )
+    data class BlockSignatureRequest(
+        override val target: AttoBlock,
+    ) : SignatureRequest<AttoBlock>
+
+    @Serializable
+    data class VoteSignatureRequest(
+        override val target: AttoVote,
+    ) : SignatureRequest<AttoVote>
+
+    @Serializable
+    data class ChallengeSignatureRequest(
+        override val target: AttoChallenge,
+        val timestamp: Instant,
+    ) : SignatureRequest<AttoChallenge>
 
     @Serializable
     data class SignatureResponse(

@@ -5,7 +5,6 @@ import cash.atto.CacheSupport
 import cash.atto.Capability
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
-import cash.atto.commons.AttoBlock
 import cash.atto.commons.AttoChallenge
 import cash.atto.commons.AttoHash
 import cash.atto.commons.AttoNetwork
@@ -16,8 +15,11 @@ import cash.atto.commons.AttoSigner
 import cash.atto.commons.AttoVote
 import cash.atto.commons.isValid
 import cash.atto.commons.toAttoVersion
-import cash.atto.signature.SignatureController.SignatureRequest
+import cash.atto.commons.toByteArray
+import cash.atto.signature.SignatureController.BlockSignatureRequest
+import cash.atto.signature.SignatureController.ChallengeSignatureRequest
 import cash.atto.signature.SignatureController.SignatureResponse
+import cash.atto.signature.SignatureController.VoteSignatureRequest
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -52,7 +54,7 @@ class SignatureStepDefinition(
                 version = 0U.toAttoVersion(),
                 network = AttoNetwork.LOCAL,
                 algorithm = AttoAlgorithm.V1,
-                publicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
+                publicKey = signer.publicKey,
                 balance = AttoAmount.MAX,
                 timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
                 sendHashAlgorithm = AttoAlgorithm.V1,
@@ -61,7 +63,7 @@ class SignatureStepDefinition(
                 representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
             )
 
-        val request = Json.encodeToString(SignatureRequest.serializer(AttoBlock.serializer()), SignatureRequest(block))
+        val request = Json.encodeToString(BlockSignatureRequest.serializer(), BlockSignatureRequest(block))
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -87,12 +89,15 @@ class SignatureStepDefinition(
     fun signVote() {
         val vote =
             AttoVote(
+                version = 0U.toAttoVersion(),
+                algorithm = AttoAlgorithm.V1,
+                publicKey = signer.publicKey,
                 blockAlgorithm = AttoAlgorithm.V1,
                 blockHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
                 timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
             )
 
-        val request = Json.encodeToString(SignatureRequest.serializer(AttoVote.serializer()), SignatureRequest(vote))
+        val request = Json.encodeToString(VoteSignatureRequest.serializer(), VoteSignatureRequest(vote))
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -107,9 +112,10 @@ class SignatureStepDefinition(
 
     @When("challenge is signed")
     fun signChallenge() {
+        val timestamp = Clock.System.now()
         val challenge = AttoChallenge(ByteArray(64))
 
-        val request = Json.encodeToString(SignatureRequest.serializer(AttoChallenge.serializer()), SignatureRequest(challenge))
+        val request = Json.encodeToString(ChallengeSignatureRequest.serializer(), ChallengeSignatureRequest(challenge, timestamp))
         val headers =
             HttpHeaders().apply {
                 contentType = MediaType.APPLICATION_JSON
@@ -118,7 +124,7 @@ class SignatureStepDefinition(
         val entity = HttpEntity(request, headers)
 
         val response = testRestTemplate.postForObject("/challenges", entity, String::class.java)
-        hash = AttoHash.hash(64, signer.publicKey.value, challenge.value)
+        hash = AttoHash.hash(64, signer.publicKey.value, challenge.value, timestamp.toByteArray())
         signature = Json.decodeFromString<SignatureResponse>(response).signature
     }
 
