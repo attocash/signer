@@ -8,6 +8,7 @@ import cash.atto.commons.AttoSigner
 import com.google.cloud.kms.v1.AsymmetricSignRequest
 import com.google.cloud.kms.v1.KeyManagementServiceClient
 import com.google.protobuf.ByteString
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -20,8 +21,11 @@ import java.util.concurrent.Executors
 @Configuration
 @ConditionalOnProperty(name = ["atto.backend"], havingValue = "GCP")
 class GCPConfiguration {
+    private val logger = KotlinLogging.logger {}
+
     @Bean
     fun gcpSigner(properties: ApplicationProperties): AttoSigner {
+        logger.info { "Backend ${properties.backend} configured" }
         val client = KeyManagementServiceClient.create()
         return GCPSigner(client, properties.key)
     }
