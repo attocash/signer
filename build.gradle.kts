@@ -25,9 +25,10 @@ repositories {
 }
 
 dependencies {
+    val commonsVersion = "3.0.1"
     val cucumberVersion = "7.20.1"
 
-    implementation("cash.atto:commons-core:c09d830-SNAPSHOT")
+    implementation("cash.atto:commons-core:$commonsVersion")
     implementation("com.google.cloud:google-cloud-kms:2.56.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
