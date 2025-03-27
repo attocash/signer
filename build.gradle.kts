@@ -14,7 +14,20 @@ plugins {
 }
 
 group = "cash.atto"
-java.sourceCompatibility = JavaVersion.VERSION_21
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+ktlint {
+    // https://github.com/JLLeitschuh/ktlint-gradle/issues/809
+    version.set("1.4.1")
+}
+
+ext["kotlin-coroutines.version"] = "1.9.0" // TEMP. Until spring updates
+ext["kotlin-serialization.version"] = "1.8.0"
 
 repositories {
     mavenCentral()
@@ -25,12 +38,12 @@ repositories {
 }
 
 dependencies {
-    val commonsVersion = "3.0.3"
+    val commonsVersion = "3.3.0"
     val cucumberVersion = "7.21.1"
 
     implementation("cash.atto:commons-core:$commonsVersion")
     implementation("com.google.cloud:google-cloud-kms:2.63.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -70,6 +83,10 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     environment("GRADLE", "true")
     useJUnitPlatform()
+}
+
+ktlint {
+    version.set("1.4.1")
 }
 
 graalvmNative {
