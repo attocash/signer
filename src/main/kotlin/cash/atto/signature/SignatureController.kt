@@ -5,6 +5,7 @@ import cash.atto.commons.AttoChallenge
 import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoVote
+import cash.atto.commons.serialiazer.InstantMillisSerializer
 import jakarta.servlet.http.HttpServletRequest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -62,6 +63,7 @@ class SignatureController(
     @Serializable
     data class ChallengeSignatureRequest(
         override val target: AttoChallenge,
+        @Serializable(with = InstantMillisSerializer::class)
         val timestamp: Instant,
     ) : SignatureRequest<AttoChallenge>
 
