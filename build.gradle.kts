@@ -56,7 +56,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
-    implementation("io.github.oshai:kotlin-logging:7.0.5")
+    implementation("io.github.oshai:kotlin-logging:7.0.6")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
