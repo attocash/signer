@@ -39,7 +39,7 @@ repositories {
 
 dependencies {
     val commonsVersion = "5.1.0"
-    val cucumberVersion = "7.23.0"
+    val cucumberVersion = "7.26.0"
 
     implementation("cash.atto:commons-core:$commonsVersion")
     implementation("com.google.cloud:google-cloud-kms:2.70.0")
