@@ -42,7 +42,7 @@ dependencies {
     val cucumberVersion = "7.23.0"
 
     implementation("cash.atto:commons-core:$commonsVersion")
-    implementation("com.google.cloud:google-cloud-kms:2.71.0")
+    implementation("com.google.cloud:google-cloud-kms:2.74.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
