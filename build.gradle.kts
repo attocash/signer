@@ -92,10 +92,7 @@ ktlint {
 graalvmNative {
     binaries {
         named("main") {
-            buildArgs.add("--static")
-            buildArgs.add("--libc=musl")
-            buildArgs.add("--no-server")
-            buildArgs.add("--strict-image-heap")
+            buildArgs.add("-march=compatibility")
         }
     }
 }
