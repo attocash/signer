@@ -34,6 +34,7 @@ jobs:
     uses: ./.github/workflows/build-image.yaml
     with:
       image: release
+      next-tag: ${{ needs.release-tag.outputs.next-tag }}
   release:
     permissions:
       contents: read
