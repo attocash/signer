@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/test.yaml
   build:
     permissions:
-      contents: read
+      contents: write
       packages: write
     needs:
       - test
