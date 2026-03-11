@@ -1,13 +1,11 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    val kotlinVersion = "2.1.21"
+    val kotlinVersion = "2.3.10"
 
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
 
-    id("org.springframework.boot") version "3.5.8"
+    id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.3"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
@@ -18,6 +16,12 @@ group = "cash.atto"
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(24)
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
 
@@ -73,19 +77,8 @@ dependencies {
     testImplementation("org.awaitility:awaitility:4.3.0")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
-    }
-}
-
 tasks.withType<Test> {
-    environment("GRADLE", "true")
     useJUnitPlatform()
-}
-
-ktlint {
-    version.set("1.4.1")
 }
 
 graalvmNative {
