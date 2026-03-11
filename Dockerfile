@@ -1,4 +1,4 @@
-FROM busybox:1.37.0-musl AS runtime-tmp
+FROM busybox:musl AS runtime-tmp
 
 RUN mkdir -p /tmp && chmod 1777 /tmp
 
@@ -13,8 +13,8 @@ LABEL org.opencontainers.image.title="atto-signer" \
       org.opencontainers.image.version="${APPLICATION_VERSION}"
 
 ENV APPLICATION_VERSION=${APPLICATION_VERSION}
-ENV JAVA_TOOL_OPTIONS="-Djava.io.tmpdir=/app"
 
+COPY --from=runtime-tmp /tmp /tmp
 COPY ./build/native/nativeCompile/signer /app/signer
 
 WORKDIR /app
