@@ -6,7 +6,6 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoVote
 import cash.atto.commons.serialiazer.InstantMillisSerializer
-import jakarta.servlet.http.HttpServletRequest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.springframework.http.HttpStatus
@@ -75,10 +74,7 @@ class SignatureController(
     private fun AttoSignature.toResponse() = SignatureResponse(this)
 
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handleError(
-        req: HttpServletRequest,
-        e: IllegalArgumentException,
-    ): ResponseEntity<Any> =
+    fun handleError(e: IllegalArgumentException): ResponseEntity<Map<String, String?>> =
         ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(mapOf("message" to e.message))

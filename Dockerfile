@@ -1,7 +1,3 @@
-FROM busybox:musl AS runtime-tmp
-
-RUN mkdir -p /tmp && chmod 1777 /tmp
-
 FROM scratch
 
 ARG APPLICATION_VERSION
@@ -14,7 +10,6 @@ LABEL org.opencontainers.image.title="atto-signer" \
 
 ENV APPLICATION_VERSION=${APPLICATION_VERSION}
 
-COPY --from=runtime-tmp /tmp /tmp
 COPY ./build/native/nativeCompile/signer /app/signer
 
 WORKDIR /app

@@ -1,37 +1,38 @@
 package cash.atto
 
-import jakarta.servlet.FilterChain
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.web.server.ServerWebExchange
+import org.springframework.web.server.WebFilter
+import org.springframework.web.server.WebFilterChain
+import reactor.core.publisher.Mono
 
 @Component
 class TokenValidationFilter(
-    val properties: ApplicationProperties,
-    val managementPort: ManagementServerProperties,
-) : OncePerRequestFilter() {
-    override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain,
-    ) {
-        val localPort = request.localPort
+    private val properties: ApplicationProperties,
+    private val managementPort: ManagementServerProperties,
+) : WebFilter {
+    override fun filter(
+        exchange: ServerWebExchange,
+        chain: WebFilterChain,
+    ): Mono<Void> {
+        val request = exchange.request
+        val localPort = request.localAddress?.port
 
-        if (request.method == "GET" || localPort == managementPort.port) {
-            filterChain.doFilter(request, response)
-            return
+        if (request.method == HttpMethod.GET || localPort == managementPort.port) {
+            return chain.filter(exchange)
         }
 
-        val token = request.getHeader(HttpHeaders.AUTHORIZATION)
+        val token = request.headers.getFirst(HttpHeaders.AUTHORIZATION)
 
-        if (token == properties.token) {
-            filterChain.doFilter(request, response)
+        return if (token == properties.token) {
+            chain.filter(exchange)
         } else {
-            response.status = HttpStatus.UNAUTHORIZED.value()
+            exchange.response.statusCode = HttpStatus.UNAUTHORIZED
+            exchange.response.setComplete()
         }
     }
 }

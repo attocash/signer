@@ -26,12 +26,14 @@ import io.cucumber.java.en.When
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.fail
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import kotlin.random.Random
 
 class SignatureStepDefinition(
@@ -41,6 +43,7 @@ class SignatureStepDefinition(
 ) : CacheSupport {
     private var hash: AttoHash? = null
     private var signature: AttoSignature? = null
+    private var response: ResponseEntity<String>? = null
 
     @Given("signer has {word} capability")
     fun setCapability(capability: String) {
@@ -49,40 +52,26 @@ class SignatureStepDefinition(
 
     @When("block is signed")
     fun signBlock() {
-        val block =
-            AttoOpenBlock(
-                version = 0U.toAttoVersion(),
-                network = AttoNetwork.LOCAL,
-                algorithm = AttoAlgorithm.V1,
-                publicKey = signer.publicKey,
-                balance = AttoAmount.MAX,
-                timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
-                sendHashAlgorithm = AttoAlgorithm.V1,
-                sendHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
-                representativeAlgorithm = AttoAlgorithm.V1,
-                representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
-            )
+        val block = buildBlock()
+        response = postBlock(block)
 
-        val request = Json.encodeToString(BlockSignatureRequest.serializer(), BlockSignatureRequest(block))
-        val headers =
-            HttpHeaders().apply {
-                contentType = MediaType.APPLICATION_JSON
-                set("Authorization", properties.token)
-            }
-        val entity = HttpEntity(request, headers)
-
-        val response = testRestTemplate.postForObject("/blocks", entity, String::class.java)
+        assertEquals(HttpStatus.OK, response!!.statusCode)
         hash = block.hash
-        signature = Json.decodeFromString<SignatureResponse>(response).signature
+        signature = Json.decodeFromString<SignatureResponse>(response!!.body!!).signature
     }
 
     @When("block is not signed")
     fun illegalSignBlock() {
-        try {
-            signBlock()
-            fail { "Block signing should have faild" }
-        } catch (e: Exception) {
-        }
+        val block = buildBlock()
+        response = postBlock(block)
+
+        assertEquals(HttpStatus.BAD_REQUEST, response!!.statusCode)
+    }
+
+    @When("block is signed with a wrong token")
+    fun signBlockWithWrongToken() {
+        val block = buildBlock()
+        response = postBlock(block, "wrong_token")
     }
 
     @When("vote is signed")
@@ -105,9 +94,10 @@ class SignatureStepDefinition(
             }
         val entity = HttpEntity(request, headers)
 
-        val response = testRestTemplate.postForObject("/votes", entity, String::class.java)
+        response = testRestTemplate.postForEntity("/votes", entity, String::class.java)
+        assertEquals(HttpStatus.OK, response!!.statusCode)
         hash = vote.hash
-        signature = Json.decodeFromString<SignatureResponse>(response).signature
+        signature = Json.decodeFromString<SignatureResponse>(response!!.body!!).signature
     }
 
     @When("challenge is signed")
@@ -123,9 +113,10 @@ class SignatureStepDefinition(
             }
         val entity = HttpEntity(request, headers)
 
-        val response = testRestTemplate.postForObject("/challenges", entity, String::class.java)
+        response = testRestTemplate.postForEntity("/challenges", entity, String::class.java)
+        assertEquals(HttpStatus.OK, response!!.statusCode)
         hash = AttoHash.hash(64, signer.publicKey.value, challenge.value, timestamp.toByteArray())
-        signature = Json.decodeFromString<SignatureResponse>(response).signature
+        signature = Json.decodeFromString<SignatureResponse>(response!!.body!!).signature
     }
 
     @Then("signature is valid")
@@ -133,7 +124,42 @@ class SignatureStepDefinition(
         assertTrue(signature!!.isValid(signer.publicKey, hash!!))
     }
 
+    @Then("request is unauthorized")
+    fun requestIsUnauthorized() {
+        assertEquals(HttpStatus.UNAUTHORIZED, response!!.statusCode)
+    }
+
     override fun clear() {
+        response = null
         signature = null
+    }
+
+    private fun buildBlock() =
+        AttoOpenBlock(
+            version = 0U.toAttoVersion(),
+            network = AttoNetwork.LOCAL,
+            algorithm = AttoAlgorithm.V1,
+            publicKey = signer.publicKey,
+            balance = AttoAmount.MAX,
+            timestamp = Instant.fromEpochMilliseconds(Clock.System.now().toEpochMilliseconds()),
+            sendHashAlgorithm = AttoAlgorithm.V1,
+            sendHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
+            representativeAlgorithm = AttoAlgorithm.V1,
+            representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
+        )
+
+    private fun postBlock(
+        block: AttoOpenBlock,
+        token: String = properties.token,
+    ): ResponseEntity<String> {
+        val request = Json.encodeToString(BlockSignatureRequest.serializer(), BlockSignatureRequest(block))
+        val headers =
+            HttpHeaders().apply {
+                contentType = MediaType.APPLICATION_JSON
+                set("Authorization", token)
+            }
+        val entity = HttpEntity(request, headers)
+
+        return testRestTemplate.postForEntity("/blocks", entity, String::class.java)
     }
 }

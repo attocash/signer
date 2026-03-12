@@ -25,3 +25,10 @@ Feature: Signature
     Given signer has VOTE capability
 
     When block is not signed
+
+  Scenario: Signing should NOT be allowed when token is wrong
+    Given signer has BLOCK capability
+
+    When block is signed with a wrong token
+
+    Then request is unauthorized
