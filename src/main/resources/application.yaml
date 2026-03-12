@@ -28,3 +28,6 @@ management:
       base-path: /
       exposure:
         include: health,metrics,prometheus
+  metrics:
+    enable:
+      process.cpu.time: false
