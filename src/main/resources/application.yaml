@@ -1,6 +1,6 @@
 spring:
   application:
-    name: signer
+    name: atto-signer
   main:
     banner-mode: off
   threads:
