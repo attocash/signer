@@ -1,6 +1,6 @@
 spring:
   application:
-    name: node
+    name: signer
   main:
     banner-mode: off
   threads:
@@ -29,5 +29,7 @@ management:
       exposure:
         include: health,metrics,prometheus
   metrics:
+    tags:
+      application: ${spring.application.name}
     enable:
       process.cpu.time: false
