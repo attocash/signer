@@ -5,7 +5,7 @@ plugins {
     kotlin("plugin.serialization") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
 
-    id("org.springframework.boot") version "3.5.10"
+    id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.graalvm.buildtools.native") version "0.11.3"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
@@ -15,7 +15,7 @@ group = "cash.atto"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -24,14 +24,6 @@ kotlin {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
-
-ktlint {
-    // https://github.com/JLLeitschuh/ktlint-gradle/issues/809
-    version.set("1.4.1")
-}
-
-ext["kotlin-coroutines.version"] = "1.9.0" // TEMP. Until spring updates
-ext["kotlin-serialization.version"] = "1.8.0"
 
 repositories {
     mavenCentral()
@@ -42,10 +34,11 @@ repositories {
 }
 
 dependencies {
-    val commonsVersion = "5.4.0"
-    val cucumberVersion = "7.23.0"
+    val commonsVersion = "6.3.2"
+    val cucumberVersion = "7.34.3"
 
     implementation("cash.atto:commons-core:$commonsVersion")
+    implementation("cash.atto:commons-spring-boot-starter:$commonsVersion")
     implementation("com.google.cloud:google-cloud-kms:2.89.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
@@ -53,7 +46,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.14")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.2")
 
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -67,6 +60,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito")
     }
+    testImplementation("org.springframework.boot:spring-boot-starter-restclient")
+    testImplementation("org.springframework.boot:spring-boot-resttestclient")
     testImplementation("io.mockk:mockk:1.14.9")
     testImplementation("io.projectreactor:reactor-test")
 

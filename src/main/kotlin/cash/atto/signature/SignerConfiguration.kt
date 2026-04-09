@@ -2,6 +2,8 @@ package cash.atto.signature
 
 import cash.atto.ApplicationProperties
 import cash.atto.BackendType
+import cash.atto.commons.AttoAddress
+import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoHash
 import cash.atto.commons.AttoPrivateKey
 import cash.atto.commons.AttoPublicKey
@@ -47,6 +49,7 @@ class SignerConfiguration {
         val key: String,
     ) : AttoSigner,
         Closeable {
+        override val algorithm = AttoAlgorithm.V1
         override val publicKey: AttoPublicKey by lazy {
             val pem = client.getPublicKey(key).pem
 
@@ -57,6 +60,9 @@ class SignerConfiguration {
                     .replace("\\s".toRegex(), "")
 
             AttoPublicKey(Base64.getDecoder().decode(cleanedPem).sliceArray(12 until 44))
+        }
+        override val address: AttoAddress by lazy {
+            AttoAddress(algorithm, publicKey)
         }
 
         val dispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
