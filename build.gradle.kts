@@ -39,7 +39,7 @@ dependencies {
 
     implementation("cash.atto:commons-core:$commonsVersion")
     implementation("cash.atto:commons-spring-boot-starter:$commonsVersion")
-    implementation("com.google.cloud:google-cloud-kms:2.91.0")
+    implementation("com.google.cloud:google-cloud-kms:2.93.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
