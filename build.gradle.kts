@@ -62,7 +62,7 @@ dependencies {
     }
     testImplementation("org.springframework.boot:spring-boot-starter-restclient")
     testImplementation("org.springframework.boot:spring-boot-resttestclient")
-    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("io.mockk:mockk:1.14.11")
     testImplementation("io.projectreactor:reactor-test")
 
     testImplementation("org.junit.platform:junit-platform-suite") // for cucumber
