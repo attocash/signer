@@ -31,6 +31,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     needs:
       - release-tag
     uses: ./.github/workflows/build-image.yaml
