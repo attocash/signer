@@ -10,7 +10,7 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoSigner
 import cash.atto.commons.fromHexToByteArray
-import cash.atto.commons.toSigner
+import cash.atto.commons.toSignerBlocking
 import com.google.cloud.kms.v1.AsymmetricSignRequest
 import com.google.cloud.kms.v1.KeyManagementServiceClient
 import com.google.protobuf.ByteString
@@ -34,7 +34,7 @@ class SignerConfiguration {
         return when (backend) {
             BackendType.LOCAL -> {
                 val privateKey = AttoPrivateKey(properties.key.fromHexToByteArray())
-                privateKey.toSigner()
+                privateKey.toSignerBlocking()
             }
 
             BackendType.GCP -> {

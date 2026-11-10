@@ -3,6 +3,7 @@ package cash.atto.signature
 import cash.atto.ApplicationProperties
 import cash.atto.CacheSupport
 import cash.atto.Capability
+import cash.atto.commons.AttoAddress
 import cash.atto.commons.AttoAlgorithm
 import cash.atto.commons.AttoAmount
 import cash.atto.commons.AttoChallenge
@@ -14,7 +15,7 @@ import cash.atto.commons.AttoPublicKey
 import cash.atto.commons.AttoSignature
 import cash.atto.commons.AttoSigner
 import cash.atto.commons.AttoVote
-import cash.atto.commons.isValid
+import cash.atto.commons.isValidBlocking
 import cash.atto.commons.toAttoVersion
 import cash.atto.commons.toByteArray
 import cash.atto.signature.SignatureController.BlockSignatureRequest
@@ -79,8 +80,7 @@ class SignatureStepDefinition(
         val vote =
             AttoVote(
                 version = 0U.toAttoVersion(),
-                algorithm = AttoAlgorithm.V1,
-                publicKey = signer.publicKey,
+                address = signer.address,
                 blockAlgorithm = AttoAlgorithm.V1,
                 blockHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
                 timestamp = AttoInstant.now(),
@@ -121,7 +121,7 @@ class SignatureStepDefinition(
 
     @Then("signature is valid")
     fun check() {
-        assertTrue(signature!!.isValid(signer.publicKey, hash!!))
+        assertTrue(signature!!.isValidBlocking(signer.publicKey, hash!!))
     }
 
     @Then("request is unauthorized")
@@ -138,14 +138,12 @@ class SignatureStepDefinition(
         AttoOpenBlock(
             version = 0U.toAttoVersion(),
             network = AttoNetwork.LOCAL,
-            algorithm = AttoAlgorithm.V1,
-            publicKey = signer.publicKey,
+            address = signer.address,
             balance = AttoAmount.MAX,
             timestamp = AttoInstant.now(),
             sendHashAlgorithm = AttoAlgorithm.V1,
             sendHash = AttoHash(Random.Default.nextBytes(ByteArray(32))),
-            representativeAlgorithm = AttoAlgorithm.V1,
-            representativePublicKey = AttoPublicKey(Random.Default.nextBytes(ByteArray(32))),
+            representativeAddress = AttoAddress(AttoAlgorithm.V1, AttoPublicKey(Random.Default.nextBytes(ByteArray(32)))),
         )
 
     private fun postBlock(

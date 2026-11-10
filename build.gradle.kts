@@ -13,6 +13,18 @@ plugins {
 
 group = "cash.atto"
 
+extra["kotlin-coroutines.version"] = "1.11.0"
+extra["kotlin-serialization.version"] = "1.12.0"
+
+// Keep ktlint's Kotlin compiler independent of Spring's dependency management.
+configurations.matching { it.name.startsWith("ktlint") }.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            requested.version?.let { useVersion(it) }
+        }
+    }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
@@ -34,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    val commonsVersion = "6.8.1"
+    val commonsVersion = "9.0.0"
     val cucumberVersion = "8.0.4"
 
     implementation("cash.atto:commons-core:$commonsVersion")
@@ -53,7 +65,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
-    implementation("io.github.oshai:kotlin-logging:8.0.4")
+    implementation("io.github.oshai:kotlin-logging:8.0.7")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
@@ -62,7 +74,7 @@ dependencies {
     }
     testImplementation("org.springframework.boot:spring-boot-starter-restclient")
     testImplementation("org.springframework.boot:spring-boot-resttestclient")
-    testImplementation("io.mockk:mockk:1.14.11")
+    testImplementation("io.mockk:mockk:1.14.12")
     testImplementation("io.projectreactor:reactor-test")
 
     testImplementation("org.junit.platform:junit-platform-suite") // for cucumber
