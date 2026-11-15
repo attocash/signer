@@ -50,11 +50,13 @@ class SignatureController(
 
     @Serializable
     data class BlockSignatureRequest(
+        @Serializable(with = LegacyBlockInputSerializer::class)
         override val target: AttoBlock,
     ) : SignatureRequest<AttoBlock>
 
     @Serializable
     data class VoteSignatureRequest(
+        @Serializable(with = LegacyVoteInputSerializer::class)
         override val target: AttoVote,
     ) : SignatureRequest<AttoVote>
 
